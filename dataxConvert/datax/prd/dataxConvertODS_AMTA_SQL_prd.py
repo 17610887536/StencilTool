@@ -21,28 +21,22 @@ for filename in os.listdir(folder_path):
             # 更新 reader 的 jdbcUrl 和 password
             if "connection" in reader:
                 for conn in reader["connection"]:
-                    if "jdbcUrl" in conn:
-                        conn["jdbcUrl"] = ["jdbc:dm://172.22.3.32:5237/CR_DEV_PRD"]
                     if "querySql" in conn:
-                        conn["querySql"] = [sql.replace("YNDB", "CR_DEV_PRD") for sql in conn["querySql"]]
-                    if "username" in reader:
-                        reader["username"] = "SYSDBA"
-                    if "password" in reader:
-                        reader["password"] = "SYSDBA"
-                    else:
-                        reader["password"] = "NHCH4Ont1M"  # 如果不存在则添加
+                        conn["querySql"] = [sql.replace("to_char(sysdate-1,'yyyy-MM-dd')", "TO_CHAR(TO_DATE('${dataDate}', 'yyyy-MM-dd'), 'yyyy-MM-dd')") for sql in conn["querySql"]]
+                    if "querySql" in conn:
+                        conn["querySql"] = [sql.replace("to_char(sysdate-1,'yyyy-mm-dd')", "TO_CHAR(TO_DATE('${dataDate}', 'yyyy-MM-dd'), 'yyyy-MM-dd')") for sql in conn["querySql"]]
+                    # else:
+                    #     reader["password"] = "NHCH4Ont1M"  # 如果不存在则添加
 
             # 更新 writer 的 jdbcUrl 和 password
             if "connection" in writer:
                 for conn in writer["connection"]:
-                    if "jdbcUrl" in conn:
-                        conn["jdbcUrl"] = "jdbc:dm://172.22.2.3:5236/TABLEDB"
-                    if "username" in reader:
-                        writer["username"] = "TABLEDB"
-                    if "password" in writer:
-                        writer["password"] = "NHCH4Ont1M"
-                    else:
-                        writer["password"] = "NHCH4Ont1M"  # 如果不存在则添加
+                    if "preSql" in writer:
+                        writer["preSql"] = [sql.replace("to_char(sysdate-1,'yyyy-MM-dd')", "TO_CHAR(TO_DATE('${dataDate}', 'yyyy-MM-dd'), 'yyyy-MM-dd')") for sql in writer["preSql"]]
+                    if "preSql" in writer:
+                        writer["preSql"] = [sql.replace("to_char(sysdate-1,'yyyy-mm-dd')", "TO_CHAR(TO_DATE('${dataDate}', 'yyyy-MM-dd'), 'yyyy-MM-dd')") for sql in writer["preSql"]]
+                    # else:
+                    #     writer["password"] = "NHCH4Ont1M"  # 如果不存在则添加
 
         # 将修改后的数据写回到文件
         with open(file_path, 'w', encoding='utf-8') as file:

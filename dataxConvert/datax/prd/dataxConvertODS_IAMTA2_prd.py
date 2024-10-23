@@ -55,6 +55,17 @@ script_template = """#!/bin/bash
 # 设置程序出错时不再继续执行
 set -e
 
+# 获取 dataDate 参数
+dataDate=$1
+
+# 检查是否传入了 dataDate 参数
+if [ -z "$dataDate" ]; then
+    echo "Error: dataDate 参数未提供"
+    exit 1
+fi
+
+echo "Data Date: $dataDate"
+
 # 定义DataX的安装路径和任务配置文件路径
 DATAX_HOME="/home/zbddm/datax/datax"  
 JOB_DIR="/home/zbddm/datax/datax/source_config/ODS_IAMTA2"
@@ -79,7 +90,7 @@ fi
 # 循环遍历任务列表，执行每个任务
 for task in "${TASKS[@]}"; do
     echo "开始执行任务: $task"
-    python "$DATAX_HOME/bin/datax.py" "$JOB_DIR/$task" > "$LOG_FILES" 2>&1
+    python "$DATAX_HOME/bin/datax.py" -p "-DdataDate='$dataDate'" "$JOB_DIR/$task" > "$LOG_FILES" 2>&1
     echo "任务执行完毕: $task"
 done
 
